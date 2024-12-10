@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Add CO₂ Emission Data</title>
+</h:head>
+<h:body>
+    <h1>Add CO₂ Emission Data</h1>
+
+    <!-- Form to add a new emission entry -->
+    <h:form>
+        <h:panelGrid columns="2">
+            <h:outputLabel for="country" value="Country:" />
+            <h:inputText id="country" value="#{emissionController.emission.country}" />
+
+            <h:outputLabel for="year" value="Year:" />
+            <h:inputText id="year" value="#{emissionController.emission.year}" />
+
+            <h:outputLabel for="co2Value" value="CO₂ Emission (tons):" />
+            <h:inputText id="co2Value" value="#{emissionController.emission.co2Value}" />
+        </h:panelGrid>
+        
+        <h:commandButton value="Add Emission" action="#{emissionController.addEmission}" />
+    </h:form>
+</h:body>
+</html>

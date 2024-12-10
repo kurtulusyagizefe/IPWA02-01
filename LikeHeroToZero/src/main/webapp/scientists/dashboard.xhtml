@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Emissions Dashboard</title>
+    <style type="text/css">
+        .ui-datatable .ui-datatable-header {
+            text-align: right !important;
+        }
+        .search-panel {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .column-right {
+            text-align: right;
+        }
+        .action-column {
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="container">
+        <h:form id="mainForm" onkeypress="if(event.keyCode == 13) { event.preventDefault(); document.getElementById('mainForm:searchButton').click(); return false; }">
+            <p:panel header="Emissions Dashboard" style="margin-bottom: 20px">
+                <p:toolbar>
+                    <p:toolbarGroup>
+                         <p:outputLabel value="Welcome, #{loginBean.currentUser.fullName}" />
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="right">
+                        <p:commandButton value="Logout" action="#{loginBean.logout}" 
+                               ajax="false" />
+                    </p:toolbarGroup>
+                </p:toolbar>
+                <br />
+                <p:commandButton value="Add Data" icon="pi pi-plus" 
+                    actionListener="#{emissionsBean.prepareNewRecord}"
+                    update=":recordForm"
+                    oncomplete="PF('recordDialog').show()"
+                    style="margin-right: 10px;"/>
+                    <br />
+                <div class="search-panel">
+                    <h:panelGrid columns="6" cellpadding="5">
+                        <p:outputLabel for="country" value="Country:" />
+                        <p:inputText id="country" value="#{emissionsBean.searchCountry}">
+                            <p:ajax event="keyup" delay="500" 
+                                    listener="#{emissionsBean.search}" 
+                                    update="emissionsTable" />
+                        </p:inputText>
+                        
+                        <p:outputLabel for="year" value="Year:" />
+                        <p:inputNumber id="year" value="#{emissionsBean.filterYear}" 
+                                     decimalPlaces="0">
+                            <p:ajax event="keyup" delay="500" 
+                                    listener="#{emissionsBean.search}" 
+                                    update="emissionsTable" />
+                        </p:inputNumber>
+                        
+                        <p:commandButton id="searchButton" value="Search" 
+                                       actionListener="#{emissionsBean.search}"
+                                       update="emissionsTable" 
+                                       icon="pi pi-search" />
+                        <p:commandButton value="Clear" 
+                                       actionListener="#{emissionsBean.clear}"
+                                       update="emissionsTable country year" 
+                                       icon="pi pi-times" />
+                    </h:panelGrid>
+                </div>
+
+                <p:dataTable id="emissionsTable" var="emission" 
+                           value="#{emissionsBean.emissions}"
+                           paginator="true" rows="10" 
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           currentPageReportTemplate="Showing {startRecord}-{endRecord} of {totalRecords}"
+                           rowsPerPageTemplate="10,20,50">
+
+                    <p:column headerText="Country" sortBy="#{emission.country}">
+                        <h:outputText value="#{emission.country}" />
+                    </p:column>
+
+                    <p:column headerText="Year" sortBy="#{emission.year}">
+                        <h:outputText value="#{emission.year}" />
+                    </p:column>
+
+                    <p:column headerText="CO2 Emissions (kt)" sortBy="#{emission.co2Value}">
+                        <h:outputText value="#{emission.co2Value}">
+                            <f:convertNumber pattern="#,##0.00" />
+                        </h:outputText>
+                    </p:column>
+                     <p:column headerText="Status" sortBy="#{emission.approved}">
+                        <h:outputText value="#{emission.approved == null ? 'Pending' : (emission.approved ? 'Approved' : 'Declined')}"
+                                      style="#{emission.approved == null ? 'color: orange' : (emission.approved ? 'color: green' : 'color: red')}" />
+                    </p:column>
+                    
+
+                    <p:column styleClass="action-column" headerText="Edit">
+                        <p:commandButton icon="pi pi-pencil" 
+                                       update=":recordForm"
+                                       oncomplete="PF('recordDialog').show()"
+                                       style="margin-right: 5px;">
+                            <f:setPropertyActionListener value="#{emission}" 
+                                                       target="#{emissionsBean.selectedRecord}" />
+                        </p:commandButton>
+                        
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="Emission Record" widgetVar="recordDialog" 
+                  modal="true" resizable="false">
+            <h:form id="recordForm">
+                <h:panelGrid columns="2" cellpadding="5">
+                    <p:outputLabel for="recordCountry" value="Country:" />
+                    <p:inputText id="recordCountry" 
+                               value="#{emissionsBean.selectedRecord.country}" 
+                               required="true" />
+
+                    <p:outputLabel for="recordYear" value="Year:" />
+                    <p:inputNumber id="recordYear" 
+                                 value="#{emissionsBean.selectedRecord.year}" 
+                                 required="true" decimalPlaces="0" />
+
+                    <p:outputLabel for="recordCO2" value="CO2 Emissions (kt):" />
+                    <p:inputNumber id="recordCO2" 
+                                 value="#{emissionsBean.selectedRecord.co2Value}" 
+                                 required="true" decimalPlaces="2" />
+                </h:panelGrid>
+
+                <p:separator />
+
+                <p:commandButton value="Save" 
+                               actionListener="#{emissionsBean.saveRecord}"
+                               oncomplete="if (!args.validationFailed) PF('recordDialog').hide()"
+                               update=":mainForm:emissionsTable :recordForm"
+                               style="margin-right: 10px;"/>
+                <p:commandButton value="Cancel" 
+                               onclick="PF('recordDialog').hide();" 
+                               type="button" />
+            </h:form>
+        </p:dialog>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Public CO2 Emissions Data</title>
+    <style type="text/css">
+        .ui-datatable .ui-datatable-header {
+            text-align: right !important;
+        }
+        .search-panel {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .column-right {
+            text-align: right;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="container">
+        <h:form id="publicEmissionsForm">
+            <p:panel header="CO2 Emissions Database - Public View" style="margin-bottom: 20px">
+                <p:toolbar>
+                    <p:toolbarGroup align="right">
+                        <p:button value="Home" outcome="/index"
+                                  icon="pi pi-home"
+                                  styleClass="ui-button-primary"/>
+                    </p:toolbarGroup>
+                </p:toolbar>
+                <div class="search-panel">
+                    <h:panelGrid columns="6" cellpadding="5">
+                        <p:outputLabel for="country" value="Country:" />
+                        <p:inputText id="country" value="#{publicEmissionsBean.searchCountry}" />
+
+                        <p:outputLabel for="year" value="Year:" />
+                        <p:inputNumber id="year" value="#{publicEmissionsBean.filterYear}"
+                                       decimalPlaces="0" />
+
+                        <p:commandButton value="Search" actionListener="#{publicEmissionsBean.search}"
+                                         update="publicEmissionsTable" icon="pi pi-search" />
+                        <p:commandButton value="Clear" actionListener="#{publicEmissionsBean.clear}"
+                                         update="publicEmissionsTable country year" icon="pi pi-times" />
+                    </h:panelGrid>
+                </div>
+
+                <p:dataTable id="publicEmissionsTable" var="emission" value="#{publicEmissionsBean.emissions}"
+                             paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="Showing {startRecord}-{endRecord} of {totalRecords}"
+                             rowsPerPageTemplate="10,20,50"
+                             emptyMessage="No records found">
+
+                    <p:column headerText="Country" sortBy="#{emission.country}" filterBy="#{emission.country}">
+                        <h:outputText value="#{emission.country}" />
+                    </p:column>
+
+                    <p:column headerText="Year" sortBy="#{emission.year}">
+                        <h:outputText value="#{emission.year}" />
+                    </p:column>
+
+                    <p:column headerText="CO2 Emissions (kt)" sortBy="#{emission.co2Value}">
+                        <h:outputText value="#{emission.co2Value}">
+                            <f:convertNumber pattern="#,##0.00" />
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,42 @@
+# Build artifacts
+target/
+build/
+dist/
+bin/
+
+# IDE files
+.settings/
+.classpath
+.project
+.idea/
+*.iml
+.vscode/
+nbproject/
+
+# Application Servers
+.metadata/
+.deployables/
+.servers/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Local configuration
+src/main/resources/application-local.properties
+src/main/resources/application-dev.properties
+
+# OS files
+.DS_Store
+Thumbs.db
